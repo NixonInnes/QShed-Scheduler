@@ -32,7 +32,6 @@ log_formatter = logging.Formatter(
 
 def gen_uuid():
     import uuid
-    
     return str(uuid.uuid4())
 
 
@@ -44,6 +43,8 @@ class Config(object):
     LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG")
 
     SCHEDULER_TIMEZONE = "Europe/London"
+
+    REQUEST_DATABASE = "requestHistory"
 
     @classmethod
     def make_log_folders(cls):

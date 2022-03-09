@@ -1,27 +1,34 @@
 import json
 from flask import request, jsonify
 
+from qshed.client.models import Request, Schedule
+
 from ... import scheduler
-from ...request import Request
+from ...request import call_request
 from . import main_bp
 
 
-@main_bp.route("/sched", methods=["POST"])
+@main_bp.route("/add", methods=["POST"])
 def schedule_request():
-    data = request.get_json(force=True)
-    data = {k:v for k,v in json.loads(data).items() if k in ["url","method","headers","data","params"]}
-    scheduler.add_job(Request.scheduler_call, "interval", seconds=10, kwargs=data)
+    schedule = Schedule.parse_raw(request.data)
+    scheduler.add_job(
+        call_request, 
+        "interval", 
+        seconds=schedule.interval, 
+        args=[schedule.request]
+    )
     return jsonify({"response": "ok"})
 
 
-@main_bp.route("/jobs", methods=["GET"])
+@main_bp.route("/list", methods=["GET"])
 def get_jobs():
     jobs = [
-        {
-            "id": job.id,
-            "name": job.name,
-            "kwargs": job.kwargs,
-            #"next_run_time": job.next_run_time
-        } for job in scheduler.get_jobs()
+        Schedule(
+            request=Request.parse_obj(job.args[0]),
+            id=job.id,
+            name=job.name,
+            interval=job.trigger.interval.seconds,
+            next_run=job.next_run_time.timestamp(),
+        ) for job in scheduler.get_jobs()
     ]
-    return json.dumps(jobs)
+    return jsonify([sched.dict() for sched in jobs])

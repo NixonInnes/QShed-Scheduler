@@ -1,5 +1,3 @@
-from flask import current_app
-
 import requests
 import time
 import hashlib
@@ -14,12 +12,11 @@ def string_hash(string) -> str:
 
 def call_request(request):
     hash_string = string_hash(request.json())
-    func = getattr(requests, method, None)
+    func = getattr(requests, request.method, None)
     if func is None:
         raise Exception(f"Invalid call method: {method}")
     last_called = time.time()
-    rtn = func(**request.dict())
+    rtn = func(**request.dict(exclude={"method"}))
     call_duration = time.time() - last_called
     call = {"time": last_called, "duration": call_duration, "response": rtn.json()}
-    client.database[current_app.config["REQUEST_DATABASE"]][hash_string].insert(call)
-    print("done")
+    client.database["requestHistory"][hash_string].insert(call)
