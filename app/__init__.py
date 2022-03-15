@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from fastapi import FastAPI
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from qshed.client import QShedClient
@@ -14,13 +14,12 @@ scheduler.add_jobstore("sqlalchemy", url="sqlite:///schedule.db")
 
 client = QShedClient("http://localhost:5000")
 
+
 def create_app():
-    app = Flask(__name__)
+    app = FastAPI()
 
-    config.init_app(app)
+    from .routers import main
 
-    from .blueprints.main import main_bp as main_blueprint
-
-    app.register_blueprint(main_blueprint)
+    app.include_router(main.router)
 
     return app
