@@ -19,4 +19,4 @@ def call_request(request):
     rtn = func(**request.dict(exclude={"method"}))
     call_duration = time.time() - last_called
     call = {"time": last_called, "duration": call_duration, "response": rtn.json()}
-    client.database["requestHistory"][hash_string].insert(call)
+    client.database["requestHistory"][hash_string].insert_one(call)
