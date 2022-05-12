@@ -3,7 +3,7 @@ import time
 import hashlib
 import json
 
-from app import client
+from ..app import client
 
 
 def string_hash(string) -> str:

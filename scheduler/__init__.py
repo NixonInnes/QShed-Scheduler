@@ -1,11 +1,8 @@
 import os
 import logging
 
-from app import create_app, scheduler
-
 
 logger = logging.getLogger(__name__)
-
 
 dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
 if os.path.exists(dotenv_path):
@@ -18,5 +15,8 @@ if os.path.exists(dotenv_path):
         logger.warn(f"{e}\nUnable to load environment file: {dotenv_path}")
 
 
-scheduler.start()
+from .app import create_app, create_scheduler
+
+
+scheduler = create_scheduler()
 app = create_app()
