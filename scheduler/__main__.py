@@ -1,5 +1,6 @@
-from . import app, scheduler
+import uvicorn
+from . import scheduler
 
 
 scheduler.start()
-app.run()
+uvicorn.run("scheduler:app", host="0.0.0.0", port=4500)
